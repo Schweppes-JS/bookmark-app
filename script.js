@@ -6,7 +6,7 @@ const websiteNameEl = document.getElementById('website-name');
 const websiteUrlEl = document.getElementById('website-url');
 const bookmarksConatainer = document.getElementById('bookmarks-container');
 
-let bookmarks = [];
+let bookmarks = {};
 
 // Show modalm, Focus on input
 function showModal() {
@@ -32,9 +32,10 @@ function validate(nameValue, urlValue) {
 
 // Build bookmarks DOM
 function buildBookmarks() {
+    // Remove all bookmark elements
+    bookmarksConatainer.textContent = '';
     // Build items
-    bookmarks.forEach((bookmark) => {
-        const { name, url } = bookmark;
+    Object.keys(bookmarks).forEach((id) => {
         // Item
         const item = document.createElement('div');
         item.classList.add('item');
@@ -42,19 +43,19 @@ function buildBookmarks() {
         const closeIcon = document.createElement('i');
         closeIcon.classList.add('fad', 'fa-times');
         closeIcon.setAttribute('title', 'Delete bookmark');
-        closeIcon.setAttribute('onclick', `deleteBookmark('${url}')`);
+        closeIcon.setAttribute('onclick', `deleteBookmark('${id}')`);
         // Favicon / Link container
         const linkInfo = document.createElement('div');
         linkInfo.classList.add('name');
         // Favicon
         const favicon = document.createElement('img');
-        favicon.setAttribute('src', `https://s2.googleusercontent.com/s2/favicons?domain=${url}`);
+        favicon.setAttribute('src', `https://s2.googleusercontent.com/s2/favicons?domain=${bookmarks[id]}`);
         favicon.setAttribute('alt', 'Favicon');
         // Link
         const link = document.createElement('a');
-        link.setAttribute('href', `${url}`);
+        link.setAttribute('href', `${bookmarks[id]}`);
         link.setAttribute('target', '_blank');
-        link.textContent = name;
+        link.textContent = id;
         // Append to bookmarks container
         linkInfo.append(favicon, link);
         item.append(closeIcon, linkInfo);
@@ -68,15 +69,22 @@ function fetchBookmarks() {
         bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
     } else {
         // Create bookmarks array in localStorage
-        bookmarks = [
-            {
-                name: "Schweppes-JS",
-                url: 'https://github.com/Schweppes-JS',
-            }
-        ];
+        const id = 'Schweppes-JS';
+        bookmarks[id] = 'https://github.com/Schweppes-JS';
         localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
     }
     buildBookmarks();
+}
+
+// Delete bookmark
+function deleteBookmark(id) {
+    // Loop through the bookmarks array
+    if (bookmarks[id]) {
+        delete bookmarks[id];
+    }
+    // Update bookmarks array in localStorage, re-populate DOM
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    fetchBookmarks();
 }
 
 // Handle data from from
@@ -90,11 +98,7 @@ function storeBookmark(e) {
     if (!validate(nameValue, urlValue)) {
         return false;
     }
-    const bookmark = {
-        name: nameValue,
-        url: urlValue
-    };
-    bookmarks.push(bookmark);
+    bookmarks[nameValue] = urlValue;
     localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
     fetchBookmarks();
     bookmarkForm.reset();
