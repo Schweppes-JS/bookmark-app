@@ -41,7 +41,7 @@ function buildBookmarks() {
         item.classList.add('item');
         // Close Icon
         const closeIcon = document.createElement('i');
-        closeIcon.classList.add('fad', 'fa-times');
+        closeIcon.classList.add('fas', 'fa-times');
         closeIcon.setAttribute('title', 'Delete bookmark');
         closeIcon.setAttribute('onclick', `deleteBookmark('${id}')`);
         // Favicon / Link container
